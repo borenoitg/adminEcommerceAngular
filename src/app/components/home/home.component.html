@@ -2,13 +2,15 @@
   <clr-header>
 
     <div class="header-nav" [clr-nav-level]="1">
-      <h1>Admin JSTORE</h1>
+      <div class="branding">
+        <span class="title">Admin JSTORE</span>
+      </div>
     </div>
 
   </clr-header>
   <div class="content-container">
     <main class="content-area">
-      <p>Products</p>
+      <app-show-product [products]="products"></app-show-product>
     </main>
     <nav class="sidenav" [clr-nav-level]="2">
       <section class="sidenav-content">
