@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges} from '@angular/core';
 import {Product} from '../../models/product';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {CategoriesService} from '../../services/categories.service';
@@ -10,7 +10,7 @@ import {Subscription} from 'rxjs';
   templateUrl: './add-or-edit-product-modal.component.html',
   styleUrls: ['./add-or-edit-product-modal.component.css']
 })
-export class AddOrEditProductModalComponent implements OnInit, OnDestroy {
+export class AddOrEditProductModalComponent implements OnInit, OnChanges, OnDestroy {
 
   @Input() product: Product;
   @Output() finish = new EventEmitter();
@@ -34,11 +34,21 @@ export class AddOrEditProductModalComponent implements OnInit, OnDestroy {
     });
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+        if (this.product) {
+          this.updateForm(this.product);
+        }
+    }
+
   public get isProductInfosInvalid(): boolean {
     return this.productForm.get('productInfos').invalid;
   }
 
   public get isIllustrationInvalid(): boolean {
+    if (this.product){
+      // En cas d'édition, et si on ne veux pas assigner directement une image, on ne reste pas bloqué
+      return false;
+    }
     return this.productForm.get('illustration').invalid;
   }
 
@@ -46,7 +56,6 @@ export class AddOrEditProductModalComponent implements OnInit, OnDestroy {
     this.categorySub = this.categoryService.getCategory().subscribe(
       (response) => {
         this.categories = response.result;
-        console.log(this.categories);
       }
     );
 
@@ -79,6 +88,8 @@ export class AddOrEditProductModalComponent implements OnInit, OnDestroy {
 
     if (this.file) {
       product.image = this.file.name;
+    }else {
+      product.image = this.product.oldImage;
     }
 
     this.finish.emit({product, file: this.file ? this.file : null});
@@ -87,5 +98,19 @@ export class AddOrEditProductModalComponent implements OnInit, OnDestroy {
 
   public detecteFiles($event): void {
     this.file = $event.target.files[0];
+  }
+
+  public updateForm(product: Product): void {
+    this.productForm.patchValue({
+      productInfos: {
+        name: product.name,
+        description: product.description,
+        price: product.price,
+        stock: product.stock
+      }
+    });
+
+    product.oldImage = product.image;
+    this.selectCategory(product.Category);
   }
 }

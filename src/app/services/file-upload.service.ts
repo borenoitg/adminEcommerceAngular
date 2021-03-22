@@ -9,7 +9,7 @@ import {environment} from '../../environments/environment';
 export class FileUploadService {
 
   private baseUrlUpload = `${environment.api + 'uploadImage.php' + '?API_KEY=' + environment.api_key}`;
-  private baseUrlDelete = `${environment.api + 'deleteImage.php' + '?API_KEY=' + environment.api_key}`;
+  private baseUrlDelete = `${environment.api + 'deleteImage.php' + '?API_KEY=+' + environment.api_key}`;
 
   constructor(private httpClient: HttpClient) {
   }
