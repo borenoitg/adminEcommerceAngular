@@ -71,21 +71,28 @@ export class ShowProductComponent implements OnInit {
     this.productModalOpen = false;
   }
 
-  private uploadImage(event): void {
-    switch (event.type) {
-      case HttpEventType.Sent:
-        console.log('Requête envoyé avec succès');
-        break;
-      case HttpEventType.UploadProgress:
-        this.progress = Math.round(event.loaded / event.total * 100);
-        break;
-      case HttpEventType.Response:
-        console.log(event.body);
-        setTimeout(() => {
-          this.progress = 0;
-        }, 1500);
-        break;
-    }
+  private uploadImage(event): Promise<any> {
+    return new Promise(
+      (resolve, reject) => {
+        switch (event.type) {
+          case HttpEventType.Sent:
+            console.log('Requête envoyé avec succès');
+            break;
+          case HttpEventType.UploadProgress:
+            this.progress = Math.round(event.loaded / event.total * 100);
+            if (this.progress === 100) {
+              resolve(true);
+            }
+            break;
+          case HttpEventType.Response:
+            console.log(event.body);
+            setTimeout(() => {
+              this.progress = 0;
+            }, 1500);
+            break;
+        }
+      }
+    );
   }
 
   private addProductToServer(product: any): void {
@@ -96,13 +103,16 @@ export class ShowProductComponent implements OnInit {
           if (this.file) {
             this.fileService.uploadImage(this.file).subscribe(
               (evenement: HttpEvent<any>) => {
-                this.uploadImage(event);
+                this.uploadImage(event).then(
+                  () => {
+                    product.idProduct = data.args.lastInsertId;
+                    product.Category = product.category;
+                    this.products.push(product);
+                  }
+                );
               }
             );
           }
-
-          product.idProduct = data.args.lastInsertId;
-          this.products.push(product);
         }
       });
   }
@@ -114,7 +124,13 @@ export class ShowProductComponent implements OnInit {
           if (this.file) {
             this.fileService.uploadImage(this.file).subscribe(
               (httpEvent: HttpEvent<any>) => {
-                this.uploadImage(event);
+                this.uploadImage(event).then(
+                  () => {
+
+                    // Update FrontEnd
+                    this.updateProduct(product);
+                  }
+                );
               }
             );
 
@@ -123,20 +139,29 @@ export class ShowProductComponent implements OnInit {
                 console.log(dataResponse);
               }
             );
-          }
+          } else {
 
-          // Update FrontEnd
-          const index = this.products.findIndex(p => p.idProduct === product.idProduct);
-          this.products = [
-            ...this.products.slice(0, index),
-            product,
-            ...this.products.slice(index + 1)
-          ];
+            // Update FrontEnd
+            this.updateProduct(product);
+          }
 
         } else {
           console.log(data.message);
         }
       }
     );
+  }
+
+  private updateProduct(product: any): void {
+
+    // Update FrontEnd
+    const index = this.products.findIndex(p => p.idProduct === product.idProduct);
+    product.Category = product.category;
+    this.products = [
+      ...this.products.slice(0, index),
+      product,
+      ...this.products.slice(index + 1)
+    ];
+
   }
 }

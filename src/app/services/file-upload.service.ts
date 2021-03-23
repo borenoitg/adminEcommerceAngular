@@ -8,8 +8,7 @@ import {environment} from '../../environments/environment';
 })
 export class FileUploadService {
 
-  private baseUrlUpload = `${environment.api + 'uploadImage.php' + '?API_KEY=' + environment.api_key}`;
-  private baseUrlDelete = `${environment.api + 'deleteImage.php' + '?API_KEY=+' + environment.api_key}`;
+  private baseUrl = `${environment.api + 'image.php' + '?API_KEY=' + environment.api_key}`;
 
   constructor(private httpClient: HttpClient) {
   }
@@ -18,7 +17,7 @@ export class FileUploadService {
     const formData: any = new FormData();
     formData.append('image', file);
 
-    return this.httpClient.post(this.baseUrlUpload, formData, {
+    return this.httpClient.post(this.baseUrl, formData, {
       reportProgress: true,
       observe: 'events'
     });
@@ -26,9 +25,8 @@ export class FileUploadService {
 
 
   public deleteImage(name: string): Observable<any> {
-    const formData: any = new FormData();
-    formData.append('name', name);
 
-    return this.httpClient.delete(this.baseUrlDelete, formData);
+    const url = this.baseUrl + '&name=' + name;
+    return this.httpClient.delete(url);
   }
 }
