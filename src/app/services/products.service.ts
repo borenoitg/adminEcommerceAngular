@@ -49,7 +49,7 @@ export class ProductsService {
     if (object) {
 
       for (const property in object) {
-        result += `&${property} = ${object[property]}`;
+        result += `&${property}=${object[property]}`;
       }
     }
 
