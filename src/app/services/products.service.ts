@@ -11,7 +11,7 @@ import {Product} from '../models/product';
 export class ProductsService {
 
   private baseUrl = `${environment.api + 'products?' + 'API_KEY=' + environment.api_key}`;
-  private baseUrlUpdate = `${environment.api + 'updateProducts?' + 'API_KEY=' + environment.api_key}`;
+  private baseUrlUpdate = `${environment.api + 'updateProducts.php' + '?API_KEY=' + environment.api_key}`;
 
   constructor(private http: HttpClient) {
   }
@@ -47,12 +47,11 @@ export class ProductsService {
     let result = '';
 
     if (object) {
-
       for (const property in object) {
-        result += `&${property} = ${object[property]}`;
+        result += `&${property}=${object[property]}`;
       }
     }
 
     return result;
-  };
+  }
 }

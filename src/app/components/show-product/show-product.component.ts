@@ -48,22 +48,20 @@ export class ShowProductComponent implements OnInit {
    * @param product le produit à supprimer
    */
   onDelete(product: Product): void {
-
   }
 
 
   handleFinish(event): void {
-
-    const product = event && event.product ? event.product : null;
-    this.file = event && event.file ? event.file : null;
-
-    if (product) {
+    if (event && event.product) {
+      const product = event.product ? event.product : null;
+      this.file = event.file ? event.file : null;
+      console.log(product);
       if (this.selectedProduct) {
-        // Edit product
+        // Edit Product
         product.idProduct = this.selectedProduct.idProduct;
         this.editProductToServer(product);
       } else {
-        // Création d'un produit
+        // Add Product
         this.addProductToServer(product);
       }
     }
